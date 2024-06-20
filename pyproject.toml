@@ -14,7 +14,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.10"
-psycopg = "*"
+psycopg = "<4"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import NoReturn, Self
+from typing import NoReturn
 
 import psycopg
 from psycopg import sql, Notify
@@ -22,7 +22,7 @@ class NotificationListener:
 
     ## Context manager methods ##
 
-    def __enter__(self) -> Self:
+    def __enter__(self: "NotificationListener") -> "NotificationListener":
         return self
 
     def __exit__(

@@ -16,7 +16,10 @@ Fixture = Union[Iterator[T], T]
 class ListenerBase:
     @pytest.fixture
     def database(self) -> Fixture[None]:
-        connection = psycopg.connect("dbname=template1 user=postgres", autocommit=True)
+        connection = psycopg.connect(
+            "dbname=template1 user=postgres password=postgres host=localhost port=5432",
+            autocommit=True,
+        )
         # Clean after unclean exit
         connection.execute("DROP DATABASE IF EXISTS notification_listener_test")
         connection.execute("CREATE DATABASE notification_listener_test")
@@ -27,7 +30,7 @@ class ListenerBase:
     @pytest.fixture
     def connection(self, database: None) -> Fixture[Connection[TupleRow]]:
         connection = psycopg.connect(
-            "dbname=notification_listener_test user=postgres",
+            "dbname=notification_listener_test user=postgres password=postgres host=localhost port=5432",
             autocommit=True,
         )
         yield connection
@@ -36,7 +39,7 @@ class ListenerBase:
     @pytest.fixture
     def listener(self, database: None) -> Fixture[NotificationListener]:
         with NotificationListener(
-            "dbname=notification_listener_test user=postgres"
+            "dbname=notification_listener_test user=postgres password=postgres host=localhost port=5432"
         ) as listener:
             yield listener
 

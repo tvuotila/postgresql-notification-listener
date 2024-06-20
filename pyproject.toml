@@ -43,3 +43,9 @@ disallow_untyped_calls = false
 
 [tool.pytest.ini_options]
 filterwarnings = ["error"]
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+log_cli_level = "info"
+testpaths = [
+  "tests",
+]

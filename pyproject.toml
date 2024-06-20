@@ -40,3 +40,6 @@ module = "tests.*"
 check_untyped_defs = true
 disallow_untyped_defs = false
 disallow_untyped_calls = false
+
+[tool.pytest.ini_options]
+filterwarnings = ["error"]

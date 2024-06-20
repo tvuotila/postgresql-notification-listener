@@ -1,0 +1,13 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+  allow:
+    # Allow both direct and indirect updates for all packages; Prevent running really outdated sub-dependencies.
+    - dependency-type: "all"
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"

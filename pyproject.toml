@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "postgresql-notification-listener"
-version = "2.0.0"
+version = "2.0.1"
 description = "Execute functions on PostgreSQL notifications"
 authors = ["Tero Vuotila <tero.vuotila@falcony.io>"]
 license = "MIT"

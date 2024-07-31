@@ -15,7 +15,7 @@ Fixture = Union[Iterator[T], T]
 @pytest.mark.timeout(1)  # Fail if we hang
 class ListenerBase:
     @pytest.fixture
-    def database(self) -> Fixture[None]:
+    def database(self) -> Fixture[None]:  # type: ignore[return]
         connection = psycopg.connect(
             "dbname=template1 user=postgres password=postgres host=localhost port=5432",
             autocommit=True,
@@ -28,7 +28,7 @@ class ListenerBase:
         connection.close()
 
     @pytest.fixture
-    def connection(self, database: None) -> Fixture[Connection[TupleRow]]:
+    def connection(self, database: None) -> Fixture[Connection[TupleRow]]:  # type: ignore[return]
         connection = psycopg.connect(
             "dbname=notification_listener_test user=postgres password=postgres host=localhost port=5432",
             autocommit=True,
@@ -37,7 +37,7 @@ class ListenerBase:
         connection.close()
 
     @pytest.fixture
-    def listener(self, database: None) -> Fixture[NotificationListener]:
+    def listener(self, database: None) -> Fixture[NotificationListener]:  # type: ignore[return]
         with NotificationListener(
             "dbname=notification_listener_test user=postgres password=postgres host=localhost port=5432"
         ) as listener:

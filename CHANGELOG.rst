@@ -1,6 +1,13 @@
 Changelog
 =========
 
+.. _v2-0-2:
+
+2.0.2
+~~~~~~~~~~~~~~~~~~~
+
+* Upload release signatures to PyPi.
+
 .. _v2-0-1:
 
 2.0.1

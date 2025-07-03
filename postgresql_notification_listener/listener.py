@@ -106,7 +106,7 @@ class NotificationListener:
 
         Args:
             initial_run (bool): Execute all callbacks before listening starts.
-            This makes sure that no notifications are left unporcessed
+            This makes sure that no notifications are left unprocessed
             while the notification listened was not running.
             (default: True)
         """

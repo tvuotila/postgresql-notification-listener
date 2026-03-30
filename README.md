@@ -10,7 +10,7 @@ The listener connects to the PostgreSQL database and sets up a notification chan
 ## Installation
 
 To install the library, run:
-pip install postgresql-notification-listener
+`pip install postgresql-notification-listener`
 
 ### Usage
 

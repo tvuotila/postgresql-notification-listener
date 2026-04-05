@@ -1,6 +1,13 @@
 Changelog
 =========
 
+.. _v3-1-0:
+
+3.1.0
+~~~~~~~~~~~~~~~~~~~
+
+* Add ``poll_interval`` to ``NotificationListener.start()`` method
+
 .. _v3-0-0:
 
 3.0.0

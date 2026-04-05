@@ -27,7 +27,7 @@ jobs:
           poetry install
 
       - name: Run Black
-        run: poetry run black .
+        run: poetry run black --check --diff .
       - name: Run Mypy
         run: poetry run mypy .
       - name: Run Ruff

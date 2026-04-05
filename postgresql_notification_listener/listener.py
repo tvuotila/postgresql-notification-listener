@@ -139,7 +139,7 @@ class NotificationListener:
 
     ## Listening methods ##
 
-    def start(self, initial_run: bool = True) -> NoReturn:  # type: ignore[misc]  # We never return
+    def start(self, initial_run: bool = True, poll_interval: float | None = None) -> NoReturn:  # type: ignore[misc]  # We never return
         """
         Starts the notification listener and executes the callbacks for each received notification.
         Duplicate notifications for a channel are ignored.
@@ -148,17 +148,22 @@ class NotificationListener:
         Args:
             initial_run (bool): Execute all callbacks before listening starts.
             This makes sure that no notifications are left unprocessed
-            while the notification listened was not running.
+            while the notification listener was not running.
             (default: True)
+            poll_interval (float | None): If specified, all callbacks will be executed after
+            the specified number of seconds when no notifications are received.
+            (default: None)
         """
         if initial_run:
             self.execute_all_callbacks()
         self._start_event_loop()
         while self.is_running.is_set():
-            self.notification_waiting.wait()
-            self.notification_waiting.clear()
-            while (channel := self.get_waiting_channel()) is not None:
-                self.execute_callbacks(channel)
+            if self.notification_waiting.wait(timeout=poll_interval):
+                self.notification_waiting.clear()
+                while (channel := self.get_waiting_channel()) is not None:
+                    self.execute_callbacks(channel)
+            else:
+                self.execute_all_callbacks()
 
     ## Execution methods ##
     def execute_all_callbacks(self) -> None:

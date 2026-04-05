@@ -161,7 +161,6 @@ class NotificationListener:
             while (channel := self.get_waiting_channel()) is not None:
                 self.execute_callbacks(channel)
 
-
     ## Execution methods ##
     def execute_all_callbacks(self) -> None:
         for channel in self.callbacks:

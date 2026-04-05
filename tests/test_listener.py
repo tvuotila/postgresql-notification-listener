@@ -43,7 +43,9 @@ class ListenerBase:
             yield listener
 
     def done_after_timeout(self, connection: Connection[TupleRow]) -> Timer:
-        timer = Timer(interval=0.1, function=lambda: connection.execute(sql.SQL("NOTIFY done")))
+        timer = Timer(
+            interval=0.1, function=lambda: connection.execute(sql.SQL("NOTIFY done"))
+        )
         timer.start()
         return timer
 
@@ -63,7 +65,9 @@ class TestCleanup(ListenerBase):
             pass
         assert listener.connection.closed
 
-    def test_closing_the_connection_stops_event_loop(self, listener: NotificationListener) -> None:
+    def test_closing_the_connection_stops_event_loop(
+        self, listener: NotificationListener
+    ) -> None:
         assert not listener.connection.closed
         listener.close()
         listener.start()
@@ -174,7 +178,6 @@ class TestSubscribe(NotificationsBase):
             with listener:
                 listener.start(initial_run=False)
         callback.assert_called_once_with()
-
 
     def test_no_call_on_unrelated_notification(
         self,

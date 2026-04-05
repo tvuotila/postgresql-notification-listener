@@ -1,10 +1,9 @@
 from types import TracebackType
-from collections import OrderedDict
 from typing import NoReturn
 from threading import Event, Lock, Thread
 
 import psycopg
-from psycopg import OperationalError, sql, Notify
+from psycopg import OperationalError, sql
 
 from .types import Callback
 

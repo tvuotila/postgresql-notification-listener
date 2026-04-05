@@ -1,8 +1,10 @@
 from types import TracebackType
+from collections import OrderedDict
 from typing import NoReturn
+from threading import Event, Lock, Thread
 
 import psycopg
-from psycopg import sql, Notify
+from psycopg import OperationalError, sql, Notify
 
 from .types import Callback
 
@@ -15,10 +17,12 @@ class NotificationListener:
     """
 
     def __init__(self, database_url: str) -> None:
-        # Stores latest Notify object in case callbacks need it
-        self.last_notification: Notify | None = None
         self.connection = psycopg.connect(database_url, autocommit=True)
         self.callbacks: dict[str, set[Callback]] = {}
+        self.notification_waiting = Event()
+        self.is_running = Event()
+        self.waiting_channels: set[str] = set()
+        self.waiting_channels_lock = Lock()
 
     ## Context manager methods ##
 
@@ -35,6 +39,44 @@ class NotificationListener:
 
     def close(self) -> None:
         self.connection.close()
+
+    ## Waiting channels methods ##
+
+    def get_waiting_channel(self) -> str | None:
+        with self.waiting_channels_lock:
+            if self.waiting_channels:
+                return self.waiting_channels.pop()
+            return None
+
+    def set_waiting_channel(self, channel: str) -> None:
+        with self.waiting_channels_lock:
+            self.waiting_channels.add(channel)
+
+    ## Event loop methods ##
+
+    def _event_loop(self) -> None:
+        if not self.is_running.is_set():
+            raise RuntimeError("Event loop is not running")
+        try:
+            notification_generator = self.connection.notifies()
+            for notification in notification_generator:
+                self.set_waiting_channel(notification.channel)
+                self.notification_waiting.set()
+        except OperationalError:
+            # Ignore connection closed errors
+            if not self.connection.closed:
+                raise
+        finally:
+            self.is_running.clear()
+            # Make sure that waiting thread is not left hanging
+            self.notification_waiting.set()
+
+    def _start_event_loop(self) -> None:
+        if self.is_running.is_set():
+            raise RuntimeError("Event loop is already running")
+        self.is_running.set()
+        thread = Thread(target=self._event_loop, daemon=True)
+        thread.start()
 
     ## Subscription methods ##
 
@@ -112,10 +154,13 @@ class NotificationListener:
         """
         if initial_run:
             self.execute_all_callbacks()
-        self._notification_generator = self.connection.notifies()
-        for notification in self._notification_generator:
-            self.last_notification = notification
-            self.execute_callbacks(notification.channel)
+        self._start_event_loop()
+        while self.is_running.is_set():
+            self.notification_waiting.wait()
+            self.notification_waiting.clear()
+            while (channel := self.get_waiting_channel()) is not None:
+                self.execute_callbacks(channel)
+
 
     ## Execution methods ##
     def execute_all_callbacks(self) -> None:

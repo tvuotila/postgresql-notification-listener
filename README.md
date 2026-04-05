@@ -29,4 +29,6 @@ To use this library, follow these steps:
 * **NotificationListener**: The main class of this library. It is responsible for setting up a notification channel and managing callbacks.
 	+ **subscribe_to_channel** : Attaches a callback function to a specific channel.  The `subscribe_to_channel` method takes two required parameters: the name of the channel to listen to and the callback function to execute when a notification is received.
 	+ **start** : Starts listening for notifications. If you don't want all attached callbacks to be called once when called, pass `initial_run=False` as an argument.
+	If you want to call all callback after X seconds if no notification is received,
+	pass `poll_interval=X`.
 

@@ -158,6 +158,14 @@ class TestStartArguments(NotificationsBase):
                 listener.start(initial_run=False)
         callback.assert_not_called()
 
+    def test_poll_interval(
+        self,
+        listener: NotificationListener,
+    ) -> None:
+        with pytest.raises(Done):
+            with listener:
+                listener.start(initial_run=False, poll_interval=0.1)
+
 
 class TestSubscribe(NotificationsBase):
     def test_call_on_notification(

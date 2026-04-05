@@ -1,6 +1,14 @@
 Changelog
 =========
 
+.. _v3-0-0:
+
+3.0.0
+~~~~~~~~~~~~~~~~~~~
+
+* Remove ``last_notification``` attribute
+* Deduplicate notifications by their ``channel``
+
 .. _v2-0-3:
 
 2.0.3

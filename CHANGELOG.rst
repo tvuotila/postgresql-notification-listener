@@ -1,6 +1,14 @@
 Changelog
 =========
 
+.. _v3-2-1:
+
+3.2.1
+~~~~~~~~~~~~~~~~~~~
+
+* Simplify callback execution. No copies or existence checks.
+
+
 .. _v3-2-0:
 
 3.2.0

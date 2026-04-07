@@ -1,6 +1,14 @@
 Changelog
 =========
 
+.. _v3-2-0:
+
+3.2.0
+~~~~~~~~~~~~~~~~~~~
+
+* Fair scheduling for waiting channels: Process channels in round robin order.
+* Build system is now Uv instead of Poetry.
+
 .. _v3-1-0:
 
 3.1.0

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+.. _v3-2-3:
+
+3.2.3
+~~~~~~~~~~~~~~~~~~~
+
+* Immutable Github releases
+
 .. _v3-2-2:
 
 3.2.2

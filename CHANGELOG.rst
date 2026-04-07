@@ -1,6 +1,13 @@
 Changelog
 =========
 
+.. _v3-2-2:
+
+3.2.2
+~~~~~~~~~~~~~~~~~~~
+
+* No code changes. Using immutable releases for 3.2.1 failed.
+
 .. _v3-2-1:
 
 3.2.1

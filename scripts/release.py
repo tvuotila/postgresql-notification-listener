@@ -18,7 +18,9 @@ CHANGELOG_FILE = PROJECT_ROOT / "CHANGELOG.rst"
 UV_LOCK_FILE = PROJECT_ROOT / "uv.lock"
 PROJECT_NAME = "postgresql-notification-listener"
 
-VERSION_PATTERN = re.compile(r'^(version\s*=\s*")(?P<version>\d+\.\d+\.\d+)("\s*)$', re.MULTILINE)
+VERSION_PATTERN = re.compile(
+    r'^(version\s*=\s*")(?P<version>\d+\.\d+\.\d+)("\s*)$', re.MULTILINE
+)
 UV_LOCK_VERSION_PATTERN = re.compile(
     rf'(\[\[package\]\]\nname = "{re.escape(PROJECT_NAME)}"\nversion = ")(?P<version>\d+\.\d+\.\d+)(")',
     re.MULTILINE,
@@ -61,7 +63,9 @@ def parse_current_version(pyproject_content: str) -> tuple[int, int, int]:
     try:
         major, minor, patch = map(int, match.group("version").split("."))
     except ValueError as error:
-        raise ReleaseError("Version in pyproject.toml is not valid semver (X.Y.Z)") from error
+        raise ReleaseError(
+            "Version in pyproject.toml is not valid semver (X.Y.Z)"
+        ) from error
 
     return major, minor, patch
 
@@ -109,7 +113,7 @@ def prompt_changelog_items() -> list[str]:
 
 def update_pyproject_version(pyproject_content: str, new_version: str) -> str:
     def replace(match: re.Match[str]) -> str:
-        return f'{match.group(1)}{new_version}{match.group(3)}'
+        return f"{match.group(1)}{new_version}{match.group(3)}"
 
     updated, count = VERSION_PATTERN.subn(replace, pyproject_content, count=1)
     if count != 1:
@@ -119,7 +123,7 @@ def update_pyproject_version(pyproject_content: str, new_version: str) -> str:
 
 def update_uv_lock_version(uv_lock_content: str, new_version: str) -> str:
     def replace(match: re.Match[str]) -> str:
-        return f'{match.group(1)}{new_version}{match.group(3)}'
+        return f"{match.group(1)}{new_version}{match.group(3)}"
 
     updated, count = UV_LOCK_VERSION_PATTERN.subn(replace, uv_lock_content, count=1)
     if count != 1:
@@ -162,7 +166,12 @@ def write_files(new_pyproject: str, new_changelog: str, new_uv_lock: str) -> Non
 
 def create_commit_and_tag(new_version: str) -> None:
     tag_name = f"v{new_version}"
-    run_git("add", str(PYPROJECT_FILE.name), str(CHANGELOG_FILE.name), str(UV_LOCK_FILE.name))
+    run_git(
+        "add",
+        str(PYPROJECT_FILE.name),
+        str(CHANGELOG_FILE.name),
+        str(UV_LOCK_FILE.name),
+    )
     run_git("commit", "-m", f"Release {tag_name}")
     run_git("tag", tag_name)
 
@@ -206,7 +215,11 @@ def main() -> int:
         changelog_items = prompt_changelog_items()
 
         if not args.yes:
-            confirm = input("Proceed with file updates, commit, and tag? [y/N]: ").strip().lower()
+            confirm = (
+                input("Proceed with file updates, commit, and tag? [y/N]: ")
+                .strip()
+                .lower()
+            )
             if confirm != "y":
                 print("Cancelled.")
                 return 1

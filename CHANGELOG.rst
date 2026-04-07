@@ -1,6 +1,13 @@
 Changelog
 =========
 
+.. _v3-2-4:
+
+3.2.4
+~~~~~~~~~~~~~~~~~~~
+
+* Publish GitHub attestations.
+
 .. _v3-2-3:
 
 3.2.3

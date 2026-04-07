@@ -171,8 +171,5 @@ class NotificationListener:
             self.execute_callbacks(channel)
 
     def execute_callbacks(self, channel: str) -> None:
-        if channel not in self.callbacks:
-            return
-        # Use a copy to allow callbacks to be removed during iteration
-        for callback in self.callbacks[channel].copy():
+        for callback in self.callbacks.get(channel, ()):
             callback()

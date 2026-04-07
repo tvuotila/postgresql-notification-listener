@@ -5,7 +5,7 @@ description = "Execute functions on PostgreSQL notifications"
 authors = [
     {name = "Tero Vuotila", email = "tero.vuotila@falcony.io"},
 ]
-license = {text = "MIT"}
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [

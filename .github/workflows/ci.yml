@@ -16,22 +16,22 @@ jobs:
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v6
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Set up UV
+        uses: astral-sh/setup-uv@v6
       - name: Set up Python 3.10
         uses: actions/setup-python@v6
         with:
           python-version: "3.10"
       - name: Install dependencies
         run: |
-          poetry install
+          uv sync
 
       - name: Run Black
-        run: poetry run black --check --diff .
+        run: uv run black --check --diff .
       - name: Run Mypy
-        run: poetry run mypy .
+        run: uv run mypy .
       - name: Run Ruff
-        run: poetry run ruff check .
+        run: uv run ruff check .
 
   test:
     runs-on: ubuntu-latest
@@ -55,17 +55,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-    - name: Install poetry
-      run: pipx install poetry
+    - name: Set up UV
+      uses: astral-sh/setup-uv@v6
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'poetry'
     - name: Install dependencies
       run: |
-        poetry install
+        uv sync
 
     - name: Test
       run: |
-        poetry run pytest
+        uv run pytest

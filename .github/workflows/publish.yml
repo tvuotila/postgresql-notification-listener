@@ -74,6 +74,7 @@ jobs:
         gh release create
         '${{ github.ref_name }}'
         --repo '${{ github.repository }}'
+        --draft
         --notes ""
     - name: Upload artifact signatures to GitHub Release
       env:
@@ -85,3 +86,11 @@ jobs:
         gh release upload
         '${{ github.ref_name }}' dist/**
         --repo '${{ github.repository }}'
+    - name: Publish GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: >-
+        gh release edit
+        '${{ github.ref_name }}'
+        --repo '${{ github.repository }}'
+        --draft=false

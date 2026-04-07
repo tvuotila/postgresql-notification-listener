@@ -41,11 +41,11 @@ class NotificationListener:
 
     ## Waiting channels methods ##
 
-    def get_waiting_channel(self) -> str | None:
+    def pop_waiting_channels(self) -> set[str]:
         with self.waiting_channels_lock:
-            if self.waiting_channels:
-                return self.waiting_channels.pop()
-            return None
+            channels = self.waiting_channels
+            self.waiting_channels = set()
+            return channels
 
     def set_waiting_channel(self, channel: str) -> None:
         with self.waiting_channels_lock:
@@ -160,7 +160,7 @@ class NotificationListener:
         while self.is_running.is_set():
             if self.notification_waiting.wait(timeout=poll_interval):
                 self.notification_waiting.clear()
-                while (channel := self.get_waiting_channel()) is not None:
+                for channel in self.pop_waiting_channels():
                     self.execute_callbacks(channel)
             else:
                 self.execute_all_callbacks()

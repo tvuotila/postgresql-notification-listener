@@ -49,11 +49,9 @@ show_error_codes = true
 strict = true
 
 
-[tool.pytest.ini_options]
+[tool.pytest]
 filterwarnings = ["error"]
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-log_cli_level = "info"
-testpaths = [
-  "tests",
-]
+strict_xfail = true
+log_cli_level = "INFO"
+testpaths = ["tests"]

@@ -91,7 +91,33 @@ def prompt_bump_part() -> BumpPart:
         print("Please enter one of: major, minor, patch")
 
 
-def prompt_changelog_items() -> list[str]:
+def list_commits_after_version(current_version: str) -> list[str]:
+    tag_name = f"v{current_version}"
+    tag_exists = subprocess.run(
+        ["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag_name}"],
+        cwd=PROJECT_ROOT,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    if tag_exists.returncode != 0:
+        return []
+
+    commits = run_git("log", f"{tag_name}..HEAD", "--pretty=format:%h %s")
+    if not commits:
+        return []
+
+    return [line for line in commits.splitlines() if line.strip()]
+
+
+def prompt_changelog_items(current_version: str, recent_commits: list[str]) -> list[str]:
+    if recent_commits:
+        print()
+        print(f"Commits since v{current_version}:")
+        for commit in recent_commits:
+            print(f"  {commit}")
+        print()
+
     print("Enter changelog bullet points (one per line).")
     print("Submit an empty line when done.")
 
@@ -207,12 +233,14 @@ def main() -> int:
         current_version = parse_current_version(pyproject_content)
         part_value = args.part if args.part else prompt_bump_part()
         part: BumpPart = cast(BumpPart, part_value)
+        current_version_text = format_version(current_version)
         new_version = format_version(bump_version(current_version, part))
 
-        print(f"Current version: {format_version(current_version)}")
+        print(f"Current version: {current_version_text}")
         print(f"New version:     {new_version}")
 
-        changelog_items = prompt_changelog_items()
+        recent_commits = list_commits_after_version(current_version_text)
+        changelog_items = prompt_changelog_items(current_version_text, recent_commits)
 
         if not args.yes:
             confirm = (

@@ -20,6 +20,8 @@ To use this library, follow these steps:
 * Create instance of the listener `listener = NotificationListener("postgresql://localhost/postgres")`
 * Define a callback function that will be executed when a notification is received.
 * Use the `subscribe_to_channel` method to attach your callback function to the notification channel: `listener.subscribe_to_channel("channel_to_listen", callback_function)`
+* You must register all callback functions before calling the `start` method.
+* You cannot unregister callback functions after calling the `start` method.
 * Start listening for notifications by calling the `start` method: `listener.start()`
 * You can trigger a notification from PostgreSQL by `NOTIFY channel_to_listen` statement.
 * The `start` method will call all attached callbacks once when called. If you don't want this behaviour, pass the `initial_run=False` argument to the start method: `listener.start(initial_run=False)`

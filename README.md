@@ -17,7 +17,7 @@ To install the library, run:
 To use this library, follow these steps:
 
 * Import the library in your Python script: `from postgresql_notification_listener import NotificationListener`
-* Create instance of the listener `listener = NotificationListener("host=your_host port=your_port dbname=your_database user=your_username password=your_password")`
+* Create instance of the listener `listener = NotificationListener("postgresql://localhost/postgres")`
 * Define a callback function that will be executed when a notification is received.
 * Use the `subscribe_to_channel` method to attach your callback function to the notification channel: `listener.subscribe_to_channel("channel_to_listen", callback_function)`
 * Start listening for notifications by calling the `start` method: `listener.start()`

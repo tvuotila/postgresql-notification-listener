@@ -1,3 +1,11 @@
+[![image](https://img.shields.io/pypi/v/postgresql-notification-listener)](https://pypi.python.org/pypi/postgresql-notification-listener)
+[![image](https://img.shields.io/pypi/l/postgresql-notification-listener)](https://pypi.python.org/pypi/postgresql-notification-listener)
+[![image](https://img.shields.io/pypi/pyversions/postgresql-notification-listener)](https://pypi.python.org/pypi/postgresql-notification-listener)
+[![image](https://img.shields.io/pypi/types/postgresql-notification-listener)](https://pypi.python.org/pypi/postgresql-notification-listener)
+[![image](https://img.shields.io/pypi/format/postgresql-notification-listener)](https://pypi.python.org/pypi/postgresql-notification-listener)
+[![image](https://img.shields.io/pypi/status/postgresql-notification-listener)](https://pypi.python.org/pypi/postgresql-notification-listener)
+[![Actions status](https://github.com/tvuotila/postgresql-notification-listener/actions/workflows/ci.yml/badge.svg)](https://github.com/tvuotila/postgresql-notification-listener/actions)
+
 # PostgreSQL Notification Listener
 
 This project is a Python library that listens to notifications from a PostgreSQL database.

@@ -110,7 +110,9 @@ def list_commits_after_version(current_version: str) -> list[str]:
     return [line for line in commits.splitlines() if line.strip()]
 
 
-def prompt_changelog_items(current_version: str, recent_commits: list[str]) -> list[str]:
+def prompt_changelog_items(
+    current_version: str, recent_commits: list[str]
+) -> list[str]:
     if recent_commits:
         print()
         print(f"Commits since v{current_version}:")

@@ -25,6 +25,7 @@ To use this library, follow these steps:
 * Start listening for notifications by calling the `start` method: `listener.start()`
 * You can trigger a notification from PostgreSQL by `NOTIFY channel_to_listen` statement.
 * The `start` method will call all attached callbacks once when called. If you don't want this behaviour, pass the `initial_run=False` argument to the start method: `listener.start(initial_run=False)`
+* `NotificationListener` can be used as a context manager: `with NotificationListener("connection string") as listener:`. The database connection automatically closes when exiting the `with` block.
 
 
 ### API

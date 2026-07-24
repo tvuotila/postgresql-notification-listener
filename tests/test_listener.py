@@ -1,22 +1,25 @@
+import time
+from collections.abc import Iterator
 from threading import Timer
-from typing import Iterator, Union, TypeVar
-import pytest
-from postgresql_notification_listener import NotificationListener
+from typing import TypeAlias, TypeVar
+from unittest.mock import MagicMock
+
 import psycopg
+import pytest
 from psycopg import Connection, sql
 from psycopg.rows import TupleRow
-from unittest.mock import MagicMock
-import time
+
+from postgresql_notification_listener import NotificationListener
 from postgresql_notification_listener.types import Callback
 
 T = TypeVar("T")
-Fixture = Union[Iterator[T], T]
+Fixture: TypeAlias = Iterator[T] | T
 
 
 @pytest.mark.timeout(1)  # Fail if we hang
 class ListenerBase:
     @pytest.fixture
-    def database(self) -> Fixture[None]:  # type: ignore[return]
+    def database(self) -> Fixture[None]:
         with psycopg.connect(
             "dbname=template1 user=postgres password=postgres host=localhost port=5432",
             autocommit=True,
@@ -26,21 +29,24 @@ class ListenerBase:
             connection.execute("CREATE DATABASE notification_listener_test")
             yield None
             connection.execute("DROP DATABASE notification_listener_test")
+        return None
 
     @pytest.fixture
-    def connection(self, database: None) -> Fixture[Connection[TupleRow]]:  # type: ignore[return]
+    def connection(self, database: None) -> Fixture[Connection[TupleRow]]:
         with psycopg.connect(
             "dbname=notification_listener_test user=postgres password=postgres host=localhost port=5432",
             autocommit=True,
         ) as connection:
             yield connection
+        return None
 
     @pytest.fixture
-    def listener(self, database: None) -> Fixture[NotificationListener]:  # type: ignore[return]
+    def listener(self, database: None) -> Fixture[NotificationListener]:
         with NotificationListener(
             "dbname=notification_listener_test user=postgres password=postgres host=localhost port=5432"
         ) as listener:
             yield listener
+        return None
 
     def done_after_timeout(self, connection: Connection[TupleRow]) -> Timer:
         timer = Timer(
@@ -140,9 +146,8 @@ class TestStartArguments(NotificationsBase):
     ) -> None:
         listener.subscribe_to_channel("channel1", callback)
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start()
+        with pytest.raises(Done), listener:
+            listener.start()
         callback.assert_called_once_with()
 
     def test_skip_running_callbacks_on_start(
@@ -153,18 +158,16 @@ class TestStartArguments(NotificationsBase):
     ) -> None:
         listener.subscribe_to_channel("channel1", callback)
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_poll_interval(
         self,
         listener: NotificationListener,
     ) -> None:
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False, poll_interval=0.1)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False, poll_interval=0.1)
 
 
 class TestSubscribe(NotificationsBase):
@@ -182,9 +185,8 @@ class TestSubscribe(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_called_once_with()
 
     def test_no_call_on_unrelated_notification(
@@ -201,9 +203,8 @@ class TestSubscribe(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY cahnnel2"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_calls_on_multiple_notifications(
@@ -221,9 +222,8 @@ class TestSubscribe(NotificationsBase):
         connection.execute(sql.SQL("NOTIFY channel1"))
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         assert callback.call_count == 1
 
     def test_multiple_callbacks(
@@ -242,9 +242,8 @@ class TestSubscribe(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_called_once_with()
         callback2.assert_called_once_with()
 
@@ -267,9 +266,8 @@ class TestSubscribe(NotificationsBase):
         connection.execute(sql.SQL("NOTIFY channel1"))
         connection.execute(sql.SQL("NOTIFY channel2"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_called_once_with()
         assert callback2.call_count == 1
 
@@ -288,9 +286,8 @@ class TestUnsubscribeFromChannel(NotificationsBase):
         assert listener.callbacks == {
             "done": {done_callback},
         }
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_unsubscribe_with_subscription(
@@ -307,9 +304,8 @@ class TestUnsubscribeFromChannel(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_unsubscribe_from_different_channel(
@@ -329,9 +325,8 @@ class TestUnsubscribeFromChannel(NotificationsBase):
         connection.execute(sql.SQL("NOTIFY channel1"))
         connection.execute(sql.SQL("NOTIFY channel2"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_called_once_with()
 
     def test_unsubscribe_from_different_callback(
@@ -351,9 +346,8 @@ class TestUnsubscribeFromChannel(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_called_once_with()
 
 
@@ -371,9 +365,8 @@ class TestUnsubscribeChannel(NotificationsBase):
         assert listener.callbacks == {
             "done": {done_callback},
         }
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_unsubscribe_with_subscription(
@@ -390,9 +383,8 @@ class TestUnsubscribeChannel(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_unsubscribe_from_different_channel(
@@ -412,9 +404,8 @@ class TestUnsubscribeChannel(NotificationsBase):
         connection.execute(sql.SQL("NOTIFY channel1"))
         connection.execute(sql.SQL("NOTIFY channel2"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_called_once_with()
 
 
@@ -433,9 +424,8 @@ class TestUnsubscribeAll(NotificationsBase):
             "done": {done_callback},
         }
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()
 
     def test_unsubscribe_with_subscription(
@@ -454,7 +444,6 @@ class TestUnsubscribeAll(NotificationsBase):
         }
         connection.execute(sql.SQL("NOTIFY channel1"))
         self.done_after_timeout(connection)
-        with pytest.raises(Done):
-            with listener:
-                listener.start(initial_run=False)
+        with pytest.raises(Done), listener:
+            listener.start(initial_run=False)
         callback.assert_not_called()

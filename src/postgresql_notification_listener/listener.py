@@ -1,9 +1,10 @@
+from threading import Event, Lock, Thread
 from types import TracebackType
 from typing import NoReturn
-from threading import Event, Lock, Thread
 
 import psycopg
 from psycopg import OperationalError, sql
+from typing_extensions import Self
 
 from .types import Callback
 
@@ -25,7 +26,7 @@ class NotificationListener:
 
     ## Context manager methods ##
 
-    def __enter__(self: "NotificationListener") -> "NotificationListener":
+    def __enter__(self: Self) -> Self:
         return self
 
     def __exit__(
@@ -139,7 +140,9 @@ class NotificationListener:
 
     ## Listening methods ##
 
-    def start(self, initial_run: bool = True, poll_interval: float | None = None) -> NoReturn:  # type: ignore[misc]  # We never return
+    def start(  # type: ignore[misc]  # We never return
+        self, initial_run: bool = True, poll_interval: float | None = None
+    ) -> NoReturn:
         """
         Starts the notification listener and executes the callbacks for each received notification.
         Duplicate notifications for a channel are ignored.

@@ -1,6 +1,16 @@
 Changelog
 =========
 
+.. _v3-2-6:
+
+3.2.6
+~~~~~~~~~~~~~~~~~~~
+
+* build: improve release script
+* style: update code style
+* build: update dependencies
+* tests: increase test timeout
+
 .. _v3-2-5:
 
 3.2.5

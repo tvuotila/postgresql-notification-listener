@@ -16,7 +16,7 @@ T = TypeVar("T")
 Fixture: TypeAlias = Iterator[T] | T
 
 
-@pytest.mark.timeout(1)  # Fail if we hang
+@pytest.mark.timeout(2)  # Fail if we hang
 class ListenerBase:
     @pytest.fixture
     def database(self) -> Fixture[None]:

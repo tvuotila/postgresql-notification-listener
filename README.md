@@ -35,6 +35,38 @@ To use this library, follow these steps:
 * The `start` method will call all attached callbacks once when called. If you don't want this behaviour, pass the `initial_run=False` argument to the start method: `listener.start(initial_run=False)`
 * `NotificationListener` can be used as a context manager: `with NotificationListener("connection string") as listener:`. The database connection automatically closes when exiting the `with` block.
 
+### Example
+
+```python
+from postgresql_notification_listener import NotificationListener
+
+
+def process_new_orders() -> None:
+    # Callbacks take no arguments. Fetch the pending work from the database here.
+    print("Orders table changed, processing new orders...")
+
+
+def refresh_cache() -> None:
+    print("Refreshing cache...")
+
+
+with NotificationListener("postgresql://localhost/postgres") as listener:
+    listener.subscribe_to_channel("new_orders", process_new_orders)
+    listener.subscribe_to_channel("cache_invalidated", refresh_cache)
+    # Runs every callback once on startup, then whenever a notification arrives.
+    # If no notification arrives within 60 seconds, all callbacks are run anyway.
+    # This call blocks forever.
+    listener.start(poll_interval=60)
+```
+
+Trigger the callbacks from PostgreSQL, for example with `psql` or from a trigger function:
+
+```sql
+NOTIFY new_orders;
+-- or
+SELECT pg_notify('cache_invalidated', '');
+```
+
 
 ### API
 * **NotificationListener**: The main class of this library. It is responsible for setting up a notification channel and managing callbacks.
